@@ -17,8 +17,8 @@ module uart_tx
 	parameter P_STOP_WIDTH = 1
 )
 (
-	input 	sys_clk = P_SYS_CLK,
-	input	rst,
+	input 						i_clk,
+	input						i_rst,
 
 	input	[P_DATA_WIDTH-1:0]	i_user_tx_data	, // tx part
 	input						i_user_tx_valid	,

@@ -15,10 +15,10 @@ module uart_rx
 	parameter P_STOP_WIDTH = 1
 )
 (
-	input 	sys_clk = P_SYS_CLK,
-	input	rst,
+	input 						i_clk,
+	input						i_rst,
 	
-	input	i_uart_rx,  //uart is full-duplex communication, following is the rx part
+	input						i_uart_rx,  //uart is full-duplex communication, following is the rx part
 	output	[P_DATA_WIDTH-1:0]	o_user_rx_data	,
 	output						o_user_rx_valid	
 );
