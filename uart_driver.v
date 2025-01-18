@@ -45,7 +45,7 @@ CLK_DIV_module_u0
 
 // reset signal can be reused in the context if different clock domain, thus a rst generator is needed.
 // clk and rst must be paired.
-rst_gen_module #(
+rst_gen_module #(  
 	.P_RST_CYCLE(1)
 )
 rst_gen_module0(

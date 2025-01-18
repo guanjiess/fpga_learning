@@ -21,12 +21,18 @@
 
 
 module CLK_DIV_module #(
-	parameter	P_CLK_DIV_CNT = 1
+	parameter	P_CLK_DIV_CNT = 1)
 )
+CLK_DIV_module_u0
 (
 	input		i_clk	,
 	input		i_rst   ,
 	output		o_clk_div  
 );
+
+
+
+
+
 
 endmodule
