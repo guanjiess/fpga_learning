@@ -16,7 +16,7 @@ reg				 r_clk_div = 0;
 always @(posedge i_clk, posedge i_rst) begin
 	if(i_rst) 
 		r_cnt <= 'd0;
-	else if(r_cnt == P_DIV_CYCLE >> 1 - 1)
+	else if(r_cnt == (P_DIV_CYCLE >> 1) - 1)
 		r_cnt <= 0;
 	else
 		r_cnt <= r_cnt +	1;
@@ -25,7 +25,7 @@ end
 always @(posedge i_clk, posedge i_rst) begin
 	if(i_rst)
 		r_clk_div <= 0;
-	else if (r_cnt == P_DIV_CYCLE >> 1 - 1)
+	else if (r_cnt == (P_DIV_CYCLE >> 1) - 1)
 		r_clk_div = ~ r_clk_div;
 	else
 		r_clk_div <= r_clk_div;

@@ -24,14 +24,14 @@ module uart_tx
 	input	[P_DATA_WIDTH-1:0]	i_user_tx_data	, // tx part
 	input						i_user_tx_valid	,
 	output						o_uart_tx		,
-	output						o_uart_tx_ready
+	output						o_user_tx_ready
 );  
 
 /***********************   	parameter      	******************************/
 
 /***********************	wire reg 		******************************/
 reg							ro_uart_tx			;
-reg							ro_uart_tx_ready	; // 1 means user can use uart_tx module to transmitt data, 0 means uart_tx is occupied.
+reg							ro_user_tx_ready	; // 1 means user can use uart_tx module to transmitt data, 0 means uart_tx is occupied.
 reg	[4:0]					r_cnt				;
 reg	[P_DATA_WIDTH - 1 : 0]	ri_user_tx_data		;
 reg							ro_check			;
@@ -42,13 +42,13 @@ reg							ro_check			;
 
 always @(posedge i_clk, posedge i_rst) begin
 	if(i_rst)
-		ro_uart_tx_ready	<=	1;	// power on, default value is 1
+		ro_user_tx_ready	<=	1;	// power on, default value is 1
 	else if(w_tx_active)
-		ro_uart_tx_ready	<=	0;	// start transmitting data
+		ro_user_tx_ready	<=	0;	// start transmitting data
 	else if(r_cnt == 1 + P_DATA_WIDTH + 1 + P_STOP_WIDTH)
-		ro_uart_tx_ready	<= 	1;
+		ro_user_tx_ready	<= 	1;
 	else
-		ro_uart_tx_ready	<= 	ro_uart_tx_ready;
+		ro_user_tx_ready	<= 	ro_user_tx_ready;
 end
 
 always @(posedge i_clk, posedge i_rst) begin
@@ -56,7 +56,7 @@ always @(posedge i_clk, posedge i_rst) begin
 		r_cnt	<= 0;   //power on
 	else if(r_cnt == 1 + P_DATA_WIDTH + 1 + P_STOP_WIDTH)
 		r_cnt 	<= 0;
-	else if(~ro_uart_tx_ready)
+	else if(~ro_user_tx_ready)
 		r_cnt	<= r_cnt + 1;
 	else
 		r_cnt	<= r_cnt;
@@ -80,7 +80,9 @@ always @(posedge i_clk, posedge i_rst) begin
 		ro_uart_tx	<= 0;
 	else if (r_cnt >= 1 && r_cnt <= P_DATA_WIDTH)
 		ro_uart_tx	<= ri_user_tx_data[0];
-	else if (r_cnt == P_DATA_WIDTH + 1)
+	else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 1)
+		ro_uart_tx	<=	~ro_check;
+	else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 2)
 		ro_uart_tx	<=	ro_check;
 	else if (r_cnt > P_DATA_WIDTH + 1 && r_cnt <= P_DATA_WIDTH + 1 + P_STOP_WIDTH)
 		ro_uart_tx	<=	1;
@@ -98,9 +100,9 @@ always @(posedge i_clk, posedge i_rst) begin
 end
 
 /************************   assign			******************************/
-assign		w_tx_active		=	ro_uart_tx_ready && i_user_tx_valid;
+assign		w_tx_active		=	ro_user_tx_ready && i_user_tx_valid;
 assign		o_uart_tx		=	ro_uart_tx;
-assign		o_uart_tx_ready	=	ro_uart_tx_ready;	
+assign		o_user_tx_ready	=	ro_user_tx_ready;	
 /************************	component		******************************/
 
 
