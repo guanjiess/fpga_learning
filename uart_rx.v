@@ -57,9 +57,10 @@ end
 always @(posedge i_clk, posedge	i_rst) begin
 	if(i_rst) 
 		ro_user_rx_valid	<= 0;
-	else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 1 && ~ro_check == i_uart_rx)
-		ro_user_rx_valid	<= 1;
-	else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 2 && ro_check == i_uart_rx)
+	//else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 1 && ~ro_check == i_uart_rx)
+	//	ro_user_rx_valid	<= 1;
+	//else if (r_cnt == P_DATA_WIDTH + 1 && P_CHECK == 2 && ro_check == i_uart_rx)
+	else if (r_cnt == P_DATA_WIDTH + 1)
 		ro_user_rx_valid	<= 1;
 	else
 		ro_user_rx_valid	<= 0;
