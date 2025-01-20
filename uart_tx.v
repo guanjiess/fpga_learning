@@ -56,7 +56,7 @@ always @(posedge i_clk, posedge i_rst) begin
 		r_cnt	<= 0;   //power on
 	else if(r_cnt == 1 + P_DATA_WIDTH + 1 + P_STOP_WIDTH)
 		r_cnt 	<= 0;
-	else if(~ro_user_tx_ready)
+	else if(!ro_user_tx_ready || w_tx_active)
 		r_cnt	<= r_cnt + 1;
 	else
 		r_cnt	<= r_cnt;
