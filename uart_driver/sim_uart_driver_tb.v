@@ -37,7 +37,7 @@ uart_driver_u0
 	.i_clk			(	r_clk				),
 	.i_rst			(	r_rst				),
 
-	.i_uart_rx		(	r_uart_rx			),  		//uart is full-duplex communication, following is the rx part
+	.i_uart_rx		(	w_uart_tx			),  		//uart is full-duplex communication, following is the rx part
 	.o_user_rx_data	(	w_user_rx_data		),
 	.o_user_rx_valid(	w_user_rx_valid		),
 
