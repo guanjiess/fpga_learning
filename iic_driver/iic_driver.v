@@ -4,11 +4,12 @@
 // Engineer: 
 
 module iic_driver(
+	/******* user interface **********/
 	input				i_clk,
 	input				i_rst,
-	input	[2:0]		i_device_address,
-	input	[12:0]		i_operation_addr,
-	input	[12:0]		i_operation_len,
+	input	[2:0]		i_slave_address,
+	input	[15:0]		i_operation_addr,
+	input	[7:0]		i_operation_len,
 	input	[1:0]		i_operation_type,
 	input				i_operation_valid,
 	output				o_operation_ready,   // handshaking of tx and rx sides.
@@ -16,9 +17,9 @@ module iic_driver(
 	output				o_write_req,
 	output	[7:0]		o_read_data,
 	output				o_read_valid,
-	
-	inout				iic_sda,
-	output				iic_scl
+	/******* iic interface ***********/
+	inout				o_iic_sda,
+	output				o_iic_scl
     );
 
 /***********************   	parameter      	******************************/
@@ -33,13 +34,16 @@ parameter				IIC_READ_DATA 	= 3'd7;
 parameter				IIC_STOP 		= 3'd8;
 
 /***********************	wire reg 		******************************/	
-reg		[2:0]			ri_device_address	;
+reg		[2:0]			ri_slave_address	;
 reg		[12:0]			ri_operation_addr	;
 reg		[12:0]			ri_operation_len	;
 reg		[1:0]			ri_operation_type	;
 reg		[7:0]			ri_write_data		;
 wire					wo_operation_ready	;
 wire					w_operation_active	;
+reg						ro_iic_sda 			;
+reg						ro_iic_scl 			;
+reg						r_iic_st			;
 
 
 /***********************	state machine	******************************/	
@@ -55,19 +59,29 @@ end
 
 
 always @(posedge i_clk, posedge i_rst) begin
-	if(i_rst) 
-	else if (w_operation_active) begin
+	if(i_rst) begin
+		r_next_state	<=	IIC_IDLE;
+	end else if (w_operation_active) begin
 		case(r_next_state)
-			IDEL: begin
+			IIC_IDLE: begin
 			end
-			IDEL: begin
+			IIC_START: begin	
+				
 			end
-			IDEL: begin
+			IIC_DEV_ADDR: begin
 			end
-			IDEL: begin
+			IIC_OP_ADDR1: begin
+			end
+			IIC_OP_ADDR2: begin
+			end
+			IIC_WRITE_DATA: begin
+			end
+			IIC_READ_DATA: begin
+			end
+			IIC_STOP: begin
 			end
 			default begin
-				
+				r_next_state	<=	IIC_STOP;
 			end
 		endcase
 	end else begin
@@ -84,22 +98,22 @@ always @(posedge i_clk, posedge i_rst) begin
 	else 
 end
 **/
-// when active, save the input information to registers
+// 1. when active, save the input information to registers
 always @(posedge i_clk, posedge i_rst) begin
 	if (i_rst) begin
-		ri_device_address	<=	0;
+		ri_slave_address	<=	0;
 		ri_operation_addr	<=	0;
 		ri_operation_len	<=	0;
 		ri_operation_type	<=	0;
 		ri_write_data		<=	0;
 	end else if (w_operation_active) begin	
-		ri_device_address	<=	i_device_address	;
+		ri_slave_address	<=	i_slave_address	;
 	     ri_operation_addr	<=	i_operation_addr	;
 	     ri_operation_len	<=	i_operation_len	     ;
 	     ri_operation_type	<=	i_operation_type	;
 	     ri_write_data		<=	i_write_data		;
 	end else begin
-		ri_device_address	<=	ri_device_address	;
+		ri_slave_address	<=	ri_slave_address	;
 		ri_operation_addr	<=	ri_operation_addr	;
 		ri_operation_len	<=	ri_operation_len	;
 		ri_operation_type	<=	ri_operation_type	;
@@ -109,6 +123,8 @@ end
 
 /************************   assign			******************************/
 assign		w_operation_active	= i_operation_valid && o_operation_ready;
-	
-	
+assign		o_iic_sda = ro_iic_sda		;
+assign		o_iic_scl = ro_iic_scl		;
+
+
 endmodule
