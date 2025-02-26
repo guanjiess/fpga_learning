@@ -21,19 +21,18 @@ wire						o_read_valid			;
 wire						io_iic_sda				;
 wire						o_iic_scl				;				
 /***********************	CLOCKS	RESET		******************************/
-reg	clk, rst;
 localparam	P_CLK_PERIOD = 10;
 
 always begin
-	clk = 0;
+	i_clk = 0;
 	# (P_CLK_PERIOD / 2);
-	clk = 1;
+	i_clk = 1;
 	# (P_CLK_PERIOD / 2);
 end
 initial begin
-	rst = 1;
+	i_rst = 1;
 	# 100
-	@ (posedge clk) rst = 0;
+	@ (posedge i_clk) i_rst = 0;
 end
 
 /***********************	Initials		******************************/
@@ -43,9 +42,9 @@ initial begin
 	i_operation_len		=	0;
 	i_operation_type	=	0;
 	i_operation_valid	=	0;
-	i_write_data		= 	0;
-	wait(!rst);  // locked until rst is 0
-	repeat(10) @(posedge clk);
+	i_write_data		= 	8'h55;
+	wait(!i_rst);  // locked until rst is 0
+	repeat(10) @(posedge i_clk);
 	send_data();
 	//forever begin
 	//end
@@ -67,7 +66,7 @@ iic_driver	iic_driver_u0(
 	.o_read_data			(	o_read_data					),
 	.o_read_valid			(	o_read_valid				),
 	/******* iic interface *****			******/
-	.o_iic_sda				(	io_iic_sda					),
+	.io_iic_sda				(	io_iic_sda					),
 	.o_iic_scl				(	o_iic_scl					)
  );
 
@@ -87,14 +86,16 @@ begin
 	i_operation_len			<=	2;
 	i_operation_type		<=	1;
 	i_operation_valid		<=	1;
-	@(posedge clk)
+	i_write_data			<=	8'h55;
+	@(posedge i_clk)
 	wait(!o_operation_ready);
 	i_slave_address			<=	0;
 	i_operation_addr		<=	16'h0000;
 	i_operation_len			<=	0;
 	i_operation_type		<=	0;
 	i_operation_valid		<=	0;
-	@(posedge clk);
+	i_write_data			<=	8'h00;
+	@(posedge i_clk);
 	wait(o_operation_ready);
 end
 endtask
@@ -105,13 +106,16 @@ begin
 end
 endtask
 
-always @(posedge clk, posedge rst) begin
-	if(rst)
+/**
+always @(posedge i_clk, posedge i_rst) begin
+	if(i_rst)
 		i_write_data	<= 	'd0;
 	else if (o_write_req)
 		i_write_data	<=	8'haa;
 	else 
 		i_write_data	<=	i_write_data;
 end
+**/
+
 
 endmodule
